@@ -1,0 +1,12 @@
+# Python bytecode files
+__pycache__/
+*.pyc
+
+# Virtual environment
+flask_env/
+
+# Docker specific
+*.log
+
+# Exclude Dockerfile from being ignored
+!Dockerfile
