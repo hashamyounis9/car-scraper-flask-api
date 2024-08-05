@@ -10,3 +10,4 @@ flask_env/
 
 # Exclude Dockerfile from being ignored
 !Dockerfile
+
