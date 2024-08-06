@@ -1,33 +1,28 @@
 from flask import Flask, request, jsonify
 from playwright.sync_api import sync_playwright
-from dotenv import load_dotenv
-import os
 
 app = Flask(__name__)
 
-load_dotenv()
+# load_dotenv()
 
 
 def scrape_car(url):
     res = {'key': 'value'}
     with sync_playwright() as pw:
-        server = os.getenv('SERVER')
-        port = os.getenv('PORT')
-        # USERNAME somehow doesn't work, returns os username
-        username = os.getenv('USERNAMES')
-        password = os.getenv('PASS')
-        print(server)
-        print(port)
-        print(username)
-        print(password)
         browser = pw.chromium.launch(proxy={
-            "server": server + ':' + port,
-            "username": username,
-            "password": password
+            "server": "45.127.248.127:5128",
+            "username": "gufqwanb",
+            "password": "jxm7x6o1k09u"
         })
         page = browser.new_page()
-        page.goto(url, timeout=60000)
-        page.wait_for_load_state()
+        try:
+            page.goto(url, timeout=60000)
+            page.wait_for_load_state()
+        except Exception as e:
+            return jsonify({"error" : e})
+        # page.screenshot("screenshot.png", full_page=True)
+        car_image = page.query_selector(
+            '#myCarousel > div.lSSlideOuter.h-thumbs > div.lSSlideWrapper.usingCss.img-box > ul > li.lslide.active > img')
         car_title = page.query_selector('#scroll_car_info > h1')
         price = page.query_selector(
             '#scrollToFixed > div.side-bar > div.well.price-well.pos-rel.mb20 > div > strong')
@@ -49,6 +44,7 @@ def scrape_car(url):
         res['mileage'] = mileage.text_content()
         res['car_type'] = car_type
         res['location'] = location.text_content()
+        res['car_image'] = car_image.get_attribute('src')
     res.pop('key')
     response = jsonify(res)
     response.status_code = 200
